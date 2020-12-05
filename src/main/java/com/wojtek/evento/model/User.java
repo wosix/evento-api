@@ -1,11 +1,13 @@
 package com.wojtek.evento.model;
 
 import lombok.*;
+import org.joda.time.DateTime;
 import org.joda.time.Instant;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -22,7 +24,7 @@ public class User {
 
     private String password;
 
-    private Instant created;
+    private String created;
 
     private boolean valid;
 
@@ -30,8 +32,4 @@ public class User {
     @JoinTable(name = "user_event", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
     private final List<Event> events = new ArrayList<>();
 
-    public User(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
 }

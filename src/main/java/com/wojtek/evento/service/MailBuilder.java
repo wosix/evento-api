@@ -1,8 +1,9 @@
 package com.wojtek.evento.service;
 
+
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -11,9 +12,9 @@ import org.thymeleaf.context.Context;
 @AllArgsConstructor
 public class MailBuilder {
 
-
+//    @Autowired
 //    private final TemplateEngine templateEngine;
-
+//
 //    String build(String message) {
 //        Context context = new Context();
 //        context.setVariable("message", message);

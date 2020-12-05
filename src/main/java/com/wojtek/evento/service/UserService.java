@@ -1,11 +1,15 @@
 package com.wojtek.evento.service;
 
 import com.wojtek.evento.dto.UserDto;
+import com.wojtek.evento.exceptions.EException;
+import com.wojtek.evento.model.NotificationEmail;
 import com.wojtek.evento.model.User;
 import com.wojtek.evento.model.VerificationToken;
 import com.wojtek.evento.repository.UserRepository;
 import com.wojtek.evento.repository.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,31 +29,19 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
-
-    public List<UserDto> findAll() {
-        List<UserDto> userDtos = new ArrayList<>();
-        Iterable<User> users = userRepository.findAll();
-        for (User user: users) {
-            userDtos.add(
-                    UserDto.builder()
-                    .email(user.getEmail())
-                    .password(user.getPassword())
-                    .build()
-            );
-        }
-        return userDtos;
-    }
+    private final MailService mailService;
 
     @Transactional
     public Long addUser(UserDto userDto) {
         User user = User.builder()
                 .email(userDto.getEmail())
                 .password(passwordEncoder.encode(userDto.getPassword()))
-                .created(Instant.now())
+                .created(DateTime.now(DateTimeZone.UTC).toString())
                 .valid(false)
                 .build();
 
         String token = generateVerificationToken(user);
+        mailService.sendMail(new NotificationEmail("Activate your account!", user.getEmail(), "http://localhost:2040/api/auth/accountVerify/" + token));
 
         return userRepository.save(user).getId();
     }
@@ -62,5 +55,33 @@ public class UserService {
         verificationTokenRepository.save(verificationToken);
 
         return token;
+    }
+
+    public void verifyAccount(String token){
+        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+        verificationToken.orElseThrow(() -> new EException("Invalid token"));
+        findUserToVerify(verificationToken.get());
+    }
+
+    @Transactional
+    protected void findUserToVerify(VerificationToken verificationToken) {
+        String mail = verificationToken.getUser().getEmail();
+        User user = userRepository.findByEmail(mail).orElseThrow(() -> new EException("Invalid mail"));
+        user.setValid(true);
+        userRepository.save(user);
+    }
+
+    public List<UserDto> findAll() {
+        List<UserDto> userDtos = new ArrayList<>();
+        Iterable<User> users = userRepository.findAll();
+        for (User user : users) {
+            userDtos.add(
+                    UserDto.builder()
+                            .email(user.getEmail())
+                            .password(user.getPassword())
+                            .build()
+            );
+        }
+        return userDtos;
     }
 }

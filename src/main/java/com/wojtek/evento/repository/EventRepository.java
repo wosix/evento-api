@@ -1,6 +1,6 @@
 package com.wojtek.evento.repository;
 
-import org.w3c.dom.events.Event;
+import com.wojtek.evento.model.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

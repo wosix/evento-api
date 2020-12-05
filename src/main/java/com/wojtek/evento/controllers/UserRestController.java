@@ -23,8 +23,8 @@ public class UserRestController {
     }
 
     @PostMapping("/users/add")
-    public Long addUser(@RequestBody UserDto user) {
-        return userService.addUser(user);
+    public Long addUser(@RequestBody UserDto userDto) {
+        return userService.addUser(userDto);
     }
 
 
