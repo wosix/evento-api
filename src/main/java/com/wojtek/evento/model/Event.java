@@ -3,11 +3,14 @@ package com.wojtek.evento.model;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Entity
 @Getter @Setter
@@ -26,16 +29,36 @@ public class Event {
 
     private EventType eventType;
 
-    private DateTime dateTime;
+    private String dateTime;
 
-    private String location;
+    @OneToOne
+    private Location location;
 
     @ManyToOne
     private User host;
 
-    @ManyToMany(mappedBy = "events")
+    @ManyToMany
+    @JoinTable(name = "user_event", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> participants;
 
-    private Long intrested;
+    public Event(String eventName, String description, EventType eventType, String dateTime, Location location, User host) {
+        this.eventName = eventName;
+        this.description = description;
+        this.eventType = eventType;
+        this.dateTime = dateTime;
+        this.location = location;
+        this.host = host;
+        this.participants = new ArrayList<>();
+    }
 
+    public Event(String eventName, String description, EventType eventType, String dateTime, Location location, User host, List<User> userList) {
+        this.eventName = eventName;
+        this.description = description;
+        this.eventType = eventType;
+        this.dateTime = dateTime;
+        this.location = location;
+        this.host = host;
+        //this.participants = new ArrayList<>();
+        this.participants = userList;
+    }
 }

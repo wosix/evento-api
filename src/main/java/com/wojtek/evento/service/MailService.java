@@ -32,7 +32,7 @@ public class MailService {
                 messageHelper.setTo(notificationEmail.getReceiver());
             };
             javaMailSender.send(mimeMessagePreparator);
-            log.info("succesful sending verification email to: " + notificationEmail.getReceiver());
+            log.info("mail send to: " + notificationEmail.getReceiver());
         } catch (MailException mex) {
             throw new EException("sending to: " + notificationEmail.getReceiver() + " ; failed, exception: " + mex);
         }

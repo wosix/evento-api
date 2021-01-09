@@ -22,6 +22,8 @@ public class User {
 
     private String email;
 
+    private String username;
+
     private String password;
 
     private String created;
@@ -29,7 +31,6 @@ public class User {
     private boolean valid;
 
     @ManyToMany
-    @JoinTable(name = "user_event", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
+    @JoinTable(name = "user_event", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private final List<Event> events = new ArrayList<>();
-
 }
